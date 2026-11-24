@@ -17,6 +17,7 @@ services:
       MYSQL_DATABASE: credit
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
 
 volumes:
   mongo-data:
