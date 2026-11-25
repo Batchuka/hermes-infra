@@ -54,6 +54,24 @@ Check that it cannot read the credit data. Expected: `ERROR 1142 ... SELECT comm
 docker compose -f local/docker-compose.yml exec mysql mysql -ucontracts -pcontracts -e "SELECT * FROM credit.x"
 ```
 
+### Credit user
+
+The `credit` schema is created by the `MYSQL_DATABASE` variable in the compose file. Its own user (`credit`, password `credit`, for local use only) is created by `local/mysql-init/02-credit.sql`. Like the contracts script, it runs only when the volume is empty (see above).
+
+Check that the `credit` user sees only its own schema. Expected: `credit`, `information_schema` and `performance_schema`, and no `contracts`.
+
+```
+docker compose -f local/docker-compose.yml exec mysql mysql -ucredit -pcredit -e "SHOW DATABASES"
+```
+
+Check that it cannot read the contracts data. Expected: `ERROR 1142 ... SELECT command denied to user 'credit'`.
+
+```
+docker compose -f local/docker-compose.yml exec mysql mysql -ucredit -pcredit -e "SELECT * FROM contracts.x"
+```
+
+Now each user sees only its own schema. The credit service still connects as `root` until Batchuka/hermes-credit#8 changes it.
+
 ## Stop
 
 Keep the data:
